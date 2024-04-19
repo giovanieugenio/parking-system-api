@@ -32,11 +32,11 @@ public class User implements Serializable{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id")
-	private UUID id;
+	@Column(name = "id", unique = true)
+	private Long id;
 	
 	@Column(name = "username", nullable = false, unique = true, length = 100)
-	private String name;
+	private String username;
 	
 	@Column(name = "password", nullable = false, length = 200)
 	private String password;
