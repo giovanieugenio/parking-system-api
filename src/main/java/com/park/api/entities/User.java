@@ -3,7 +3,6 @@ package com.park.api.entities;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.UUID;
 
 import com.park.api.entities.enums.Role;
 
@@ -43,7 +42,7 @@ public class User implements Serializable{
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false, length = 25)
-	private Role role;	
+	private Role role = Role.ROLE_CLIENT;
 	
 	@Column(name = "newDate")
 	private LocalDateTime newDate;
