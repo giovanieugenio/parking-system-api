@@ -20,6 +20,7 @@ import com.park.api.web.dto.UserPasswordDTO;
 import com.park.api.web.dto.UserResponseDTO;
 import com.park.api.web.dto.mapper.UserMapper;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class UserController {
 	private UserService userService;
 	
 	@PostMapping
-	public ResponseEntity<UserResponseDTO> create(@RequestBody UserCreateDTO userDTO){
+	public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserCreateDTO userDTO){
 		User newUser = userService.salvar(UserMapper.toUser(userDTO));
 		return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDTO(newUser));
 	}

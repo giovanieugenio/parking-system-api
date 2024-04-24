@@ -1,5 +1,8 @@
 package com.park.api.web.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,8 +16,12 @@ import lombok.ToString;
 @ToString
 public class UserCreateDTO {
 
+	@NotBlank
+	@Email(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}$\"\r\n")
 	private String username;
-	private String password;
 	
+	@NotBlank
+	@Size(min = 6, max = 6)
+	private String password;
 
 }
