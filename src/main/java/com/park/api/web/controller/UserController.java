@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.park.api.entities.User;
 import com.park.api.service.UserService;
 import com.park.api.web.dto.UserCreateDTO;
+import com.park.api.web.dto.UserPasswordDTO;
 import com.park.api.web.dto.UserResponseDTO;
 import com.park.api.web.dto.mapper.UserMapper;
 
@@ -36,15 +37,15 @@ public class UserController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<User> findById(@PathVariable Long id){
+	public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id){
 		User find = userService.findById(id);
-		return ResponseEntity.ok().body(find);
+		return ResponseEntity.ok().body(UserMapper.toDTO(find));
 	}
 	
 	@PatchMapping("/{id}")
-	public ResponseEntity<User> updatePassword(@PathVariable Long id, @RequestBody User user){
-		User up = userService.editPassword(id, user.getPassword());
-		return ResponseEntity.ok().body(up);
+	public ResponseEntity<Void> updatePassword(@PathVariable Long id, @RequestBody UserPasswordDTO dto){
+		User up = userService.editPassword(id, dto.getCurrentPassword(), dto.getNewPassword(), dto.getConfirmPassword());
+		return ResponseEntity.noContent().build();
 	}
 	
 	@GetMapping

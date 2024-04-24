@@ -11,10 +11,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class UserResponseDTO {
+public class UserPasswordDTO {
 
-	private Long id;
-	private String username;
-	private String role;
-	
+	private String currentPassword;
+	private String newPassword;
+	private String confirmPassword;
 }
