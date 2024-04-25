@@ -3,9 +3,12 @@ package com.park.api.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.park.api.entities.User;
+import com.park.api.exception.EntityNotFoundException;
+import com.park.api.exception.UsernameUniqueViolationException;
 import com.park.api.repositories.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -20,12 +23,16 @@ public class UserService {
 	
 	@Transactional
 	public User salvar(User user) {
-		return userRepository.save(user);
+		try{
+			return userRepository.save(user);
+		} catch (DataIntegrityViolationException e) {
+			throw new UsernameUniqueViolationException(String.format("Username '%s' already exists", user.getUsername()));
+		}
 	}
 	
 	@Transactional
 	public User findById(Long id) {
-		return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+		return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.format("User 'id='%s''not found", id)));
 	}
 	
 	@Transactional
