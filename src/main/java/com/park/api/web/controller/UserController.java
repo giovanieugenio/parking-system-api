@@ -19,10 +19,17 @@ import com.park.api.web.dto.UserCreateDTO;
 import com.park.api.web.dto.UserPasswordDTO;
 import com.park.api.web.dto.UserResponseDTO;
 import com.park.api.web.dto.mapper.UserMapper;
+import com.park.api.web.exceptions.ErrorMessage;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Users", description = "Contains all operations related to resources for registering, editing and reading users")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "api/v1/users")
@@ -30,6 +37,21 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+	
+	@Operation(summary = "Create a new user", responses = {
+			@ApiResponse(responseCode = "201", 
+					description = "resource created successfully",
+					content = @Content(mediaType = "application/json", 
+					schema = @Schema(implementation = UserResponseDTO.class))),
+			@ApiResponse(responseCode = "409", 
+					description = "username already exists!",
+					content = @Content(mediaType = "application/json", 
+					schema = @Schema(implementation = ErrorMessage.class))),
+			@ApiResponse(responseCode = "422", 
+					description = "invalid input data",
+					content = @Content(mediaType = "application/json", 
+					schema = @Schema(implementation = ErrorMessage.class))),
+	})
 	
 	@PostMapping
 	public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserCreateDTO userDTO){
