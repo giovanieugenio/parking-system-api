@@ -22,6 +22,7 @@ import com.park.api.web.dto.mapper.UserMapper;
 import com.park.api.web.exceptions.ErrorMessage;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -52,25 +53,54 @@ public class UserController {
 					content = @Content(mediaType = "application/json", 
 					schema = @Schema(implementation = ErrorMessage.class))),
 	})
-	
 	@PostMapping
 	public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserCreateDTO userDTO){
 		User newUser = userService.salvar(UserMapper.toUser(userDTO));
 		return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDTO(newUser));
 	}
 	
+	@Operation(summary = "Retrieve a user by id", responses = {
+			@ApiResponse(responseCode = "200", 
+					description = "Resource retrieved successfully!",
+					content = @Content(mediaType = "application/json", 
+					schema = @Schema(implementation = UserResponseDTO.class))),
+			@ApiResponse(responseCode = "404", 
+					description = "Resource not found.",
+					content = @Content(mediaType = "application/json", 
+					schema = @Schema(implementation = ErrorMessage.class))),
+	})
 	@GetMapping("/{id}")
 	public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id){
 		User find = userService.findById(id);
 		return ResponseEntity.ok().body(UserMapper.toDTO(find));
 	}
 	
+	@Operation(summary = "Update password", responses = {
+			@ApiResponse(responseCode = "204", 
+					description = "Resource updated successfully!",
+					content = @Content(mediaType = "application/json", 
+					schema = @Schema(implementation = Void.class))),
+			@ApiResponse(responseCode = "404", 
+					description = "Username not found.",
+					content = @Content(mediaType = "application/json", 
+					schema = @Schema(implementation = ErrorMessage.class))),
+			@ApiResponse(responseCode = "400", 
+			description = "invalid password!",
+			content = @Content(mediaType = "application/json", 
+			schema = @Schema(implementation = ErrorMessage.class))),
+	})
 	@PatchMapping("/{id}")
 	public ResponseEntity<Void> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDTO dto){
 		User up = userService.editPassword(id, dto.getCurrentPassword(), dto.getNewPassword(), dto.getConfirmPassword());
 		return ResponseEntity.noContent().build();
 	}
 	
+	@Operation(summary = "Retrieve all users", responses = {
+			@ApiResponse(responseCode = "200", 
+					description = "All registered users",
+					content = @Content(mediaType = "application/json", 
+					array = @ArraySchema(schema = @Schema(implementation = UserResponseDTO.class)))),
+	})
 	@GetMapping
 	public ResponseEntity<List<UserResponseDTO>> getAll(){
 		List<User> list = userService.findAll();
