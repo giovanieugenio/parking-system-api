@@ -17,7 +17,7 @@ import lombok.ToString;
 public class UserCreateDTO {
 
 	@NotBlank
-	@Email
+	@Email(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
 	private String username;
 	
 	@NotBlank

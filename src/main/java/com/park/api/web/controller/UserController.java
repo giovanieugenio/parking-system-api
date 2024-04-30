@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Users", description = "Contains all operations related to resources for registering, editing and reading users")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "api/v1/users")
+@RequestMapping(value = "/api/v1/users")
 public class UserController {
 
 	@Autowired
@@ -85,9 +85,13 @@ public class UserController {
 					content = @Content(mediaType = "application/json", 
 					schema = @Schema(implementation = ErrorMessage.class))),
 			@ApiResponse(responseCode = "400", 
-			description = "invalid password!",
-			content = @Content(mediaType = "application/json", 
-			schema = @Schema(implementation = ErrorMessage.class))),
+					description = "invalid password!",
+					content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ErrorMessage.class))),
+			@ApiResponse(responseCode = "422",
+					description = "invalid fields",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ErrorMessage.class))),
 	})
 	@PatchMapping("/{id}")
 	public ResponseEntity<Void> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDTO dto){
