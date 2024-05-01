@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import com.park.api.entities.enums.Role;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -42,7 +40,7 @@ public class User implements Serializable{
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false, length = 25)
-	private Role role = Role.ROLE_CLIENT;
+	public Role role = Role.ROLE_CLIENT;
 	
 	@Column(name = "newDate")
 	private LocalDateTime newDate;
@@ -76,5 +74,10 @@ public class User implements Serializable{
 	@Override
 	public String toString() {
 		return "User [id=" + id + "]";
-	}	
+	}
+
+	public enum Role {
+		ROLE_ADMIN,
+		ROLE_CLIENT
+	}
 }

@@ -52,4 +52,14 @@ public class UserService {
 	public List<User> findAll(){
 		return userRepository.findAll();
 	}
+
+    @Transactional
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException(String.format("User '%s' not found", username)));
+    }
+
+    @Transactional
+    public User.Role findRoleByUsername(String username){
+        return userRepository.findRoleByUsername(username);
+    }
 }
