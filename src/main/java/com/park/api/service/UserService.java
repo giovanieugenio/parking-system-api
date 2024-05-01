@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.park.api.entities.User;
@@ -20,10 +21,14 @@ public class UserService {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	@Transactional
-	public User salvar(User user) {
+	public User saveUser(User user) {
 		try{
+			user.setPassword(passwordEncoder.encode(user.getPassword()));
 			return userRepository.save(user);
 		} catch (DataIntegrityViolationException e) {
 			throw new UsernameUniqueViolationException(String.format("Username '%s' already exists", user.getUsername()));
@@ -41,10 +46,10 @@ public class UserService {
 			throw new RuntimeException("new password different from confirmation");
 		}
 		User user = userRepository.findById(id).get();
-		if(!user.getPassword().equals(currentPassword)) {
+		if(passwordEncoder.matches(currentPassword, user.getPassword())) {
 			throw new RuntimeException("password does not match the current one");
 		}
-		user.setPassword(newPassword);
+		user.setPassword(passwordEncoder.encode(newPassword));
 		return user;	
 	}
 	
