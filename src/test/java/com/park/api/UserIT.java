@@ -100,6 +100,7 @@ public class UserIT {
 	public void findUser_WithExistingId_Status200() {
 		UserResponseDTO responseBody = testClient.get()
 				.uri("/api/v1/users/100")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
 				.exchange()
 				.expectStatus().isOk()
 				.expectBody(UserResponseDTO.class)
@@ -109,12 +110,39 @@ public class UserIT {
 		Assertions.assertThat(responseBody.getId()).isEqualTo(100);
 		Assertions.assertThat(responseBody.getUsername()).isEqualTo("joel@gmail.com");
 		Assertions.assertThat(responseBody.getRole()).isEqualTo("ADMIN");
+
+		responseBody = testClient.get()
+				.uri("/api/v1/users/101")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
+				.exchange()
+				.expectStatus().isOk()
+				.expectBody(UserResponseDTO.class)
+				.returnResult().getResponseBody();
+
+		Assertions.assertThat(responseBody).isNotNull();
+		Assertions.assertThat(responseBody.getId()).isEqualTo(101);
+		Assertions.assertThat(responseBody.getUsername()).isEqualTo("ellie@gmail.com");
+		Assertions.assertThat(responseBody.getRole()).isEqualTo("CLIENT");
+
+		responseBody = testClient.get()
+				.uri("/api/v1/users/101")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "ellie@gmail.com", "123456"))
+				.exchange()
+				.expectStatus().isOk()
+				.expectBody(UserResponseDTO.class)
+				.returnResult().getResponseBody();
+
+		Assertions.assertThat(responseBody).isNotNull();
+		Assertions.assertThat(responseBody.getId()).isEqualTo(101);
+		Assertions.assertThat(responseBody.getUsername()).isEqualTo("ellie@gmail.com");
+		Assertions.assertThat(responseBody.getRole()).isEqualTo("CLIENT");
 	}
 
 	@Test
 	public void findUser_WithNonExistentId_Status404() {
 		ErrorMessage responseBody = testClient.get()
 				.uri("/api/v1/users/0")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
 				.exchange()
 				.expectStatus().isNotFound()
 				.expectBody(ErrorMessage.class)
@@ -125,9 +153,32 @@ public class UserIT {
 	}
 
 	@Test
+	public void findUser_WithClientUserFindByAnotherClientUser_Status403() {
+		ErrorMessage responseBody = testClient.get()
+				.uri("/api/v1/users/101")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "abby@gmail.com", "123456"))
+				.exchange()
+				.expectStatus().isForbidden()
+				.expectBody(ErrorMessage.class)
+				.returnResult().getResponseBody();
+
+		Assertions.assertThat(responseBody).isNotNull();
+		Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
+	}
+
+	@Test
 	public void editPassword_Status204() {
 		testClient.patch()
 				.uri("/api/v1/users/100")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(new UserPasswordDTO("123456", "456789", "456789"))
+				.exchange()
+				.expectStatus().isNoContent();
+
+		testClient.patch()
+				.uri("/api/v1/users/101")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "abby@gmail.com", "123456"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(new UserPasswordDTO("123456", "456789", "456789"))
 				.exchange()
@@ -135,19 +186,39 @@ public class UserIT {
 	}
 
 	@Test
-	public void editPassword_WithNonExistentPassowrd_Status404() {
-		testClient.patch()
+	public void editPassword_WithDifferentUsers_Status403() {
+		ErrorMessage responseBody = testClient.patch()
 				.uri("/api/v1/users/0")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(new UserPasswordDTO("123456", "456789", "456789"))
 				.exchange()
-				.expectStatus().isNoContent();
+				.expectStatus().isForbidden()
+				.expectBody(ErrorMessage.class)
+				.returnResult().getResponseBody();
+
+		Assertions.assertThat(responseBody).isNotNull();
+		Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
+
+		responseBody = testClient.patch()
+				.uri("/api/v1/users/0")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "ellie@gmail.com", "123456"))
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(new UserPasswordDTO("123456", "456789", "456789"))
+				.exchange()
+				.expectStatus().isForbidden()
+				.expectBody(ErrorMessage.class)
+				.returnResult().getResponseBody();
+
+		Assertions.assertThat(responseBody).isNotNull();
+		Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
 	}
 
 	@Test
 	public void editPassword_WithInvalidFields_Status422() {
 		ErrorMessage responseBody = testClient.patch()
 				.uri("/api/v1/users/100")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(new UserPasswordDTO("", "", ""))
 				.exchange()
@@ -160,6 +231,7 @@ public class UserIT {
 
 		responseBody = testClient.patch()
 				.uri("/api/v1/users/100")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(new UserPasswordDTO("12345", "12345", "12345"))
 				.exchange()
@@ -172,6 +244,7 @@ public class UserIT {
 
 		responseBody = testClient.patch()
 				.uri("/api/v1/users/100")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(new UserPasswordDTO("12345678", "12345678", "12345678"))
 				.exchange()
@@ -184,36 +257,39 @@ public class UserIT {
 	}
 
 	@Test
-	public void editPassword_WithInvalidFields_Status500() {
+	public void editPassword_WithInvalidFields_Status400() {
 		ErrorMessage responseBody = testClient.patch()
 				.uri("/api/v1/users/100")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(new UserPasswordDTO("123456", "852741", "808080"))
 				.exchange()
-				.expectStatus().isEqualTo(500)
+				.expectStatus().isEqualTo(400)
 				.expectBody(ErrorMessage.class)
 				.returnResult().getResponseBody();
 
 		Assertions.assertThat(responseBody).isNotNull();
-		Assertions.assertThat(responseBody.getStatus()).isEqualTo(500);
+		Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
 
 		responseBody = testClient.patch()
 				.uri("/api/v1/users/100")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(new UserPasswordDTO("808080", "123456", "123456"))
 				.exchange()
-				.expectStatus().isEqualTo(500)
+				.expectStatus().isEqualTo(400)
 				.expectBody(ErrorMessage.class)
 				.returnResult().getResponseBody();
 
 		Assertions.assertThat(responseBody).isNotNull();
-		Assertions.assertThat(responseBody.getStatus()).isEqualTo(500);
+		Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
 	}
 
 	@Test
-	public void findAllUsers_WithExistingId_Status200() {
+	public void findAllUsers_WithExistingIdAdminPermission_Status200() {
 		List<UserResponseDTO> responseBody = testClient.get()
 				.uri("/api/v1/users")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
 				.exchange()
 				.expectStatus().isOk()
 				.expectBodyList(UserResponseDTO.class)
@@ -222,5 +298,20 @@ public class UserIT {
 		Assertions.assertThat(responseBody).isNotNull();
 		Assertions.assertThat(responseBody.size()).isEqualTo(3);
 
+	}
+
+	@Test
+	public void listAllUsers_WithUserNoPermission_Status403() {
+		ErrorMessage responseBody = testClient
+				.get()
+				.uri("/api/v1/usuarios")
+				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "ellie@email.com", "123456"))
+				.exchange()
+				.expectStatus().isForbidden()
+				.expectBody(ErrorMessage.class)
+				.returnResult().getResponseBody();
+
+		org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+		org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
 	}
 }
