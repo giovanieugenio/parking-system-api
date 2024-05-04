@@ -1,5 +1,6 @@
 package com.park.api.web.exceptions;
 
+import com.park.api.exception.CpfUniqueViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class ApiExceptionHandler {
 				.body(new ErrorMessage(request, HttpStatus.NOT_FOUND, e.getMessage()));
 	}
 
-	@ExceptionHandler(UsernameUniqueViolationException.class)
+	@ExceptionHandler({UsernameUniqueViolationException.class, CpfUniqueViolationException.class})
 	public ResponseEntity<ErrorMessage> usernameUniqueViolationException(RuntimeException e, 
 			HttpServletRequest request){
 		log.error("Api error ", e);
