@@ -2,12 +2,10 @@ package com.park.api;
 
 import com.park.api.web.dto.UserPasswordDTO;
 import com.park.api.web.exceptions.ErrorMessage;
-import jakarta.validation.constraints.Null;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
