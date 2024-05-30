@@ -137,7 +137,7 @@ public class UserIT {
 	}
 
 	@Test
-	public void findUser_WithNonExistentId_Status404() {
+	public void findUser_WithNonExistingId_Status404() {
 		ErrorMessage responseBody = testClient.get()
 				.uri("/api/v1/users/0")
 				.headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
