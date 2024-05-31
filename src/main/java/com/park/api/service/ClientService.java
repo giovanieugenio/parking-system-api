@@ -1,6 +1,7 @@
 package com.park.api.service;
 
 import com.park.api.entities.Client;
+import com.park.api.entities.Vacancy;
 import com.park.api.exception.CpfUniqueViolationException;
 import com.park.api.exception.EntityNotFoundException;
 import com.park.api.repositories.ClientRepository;
@@ -44,4 +45,11 @@ public class ClientService {
     public Client getByUserId(Long id) {
         return clientRepository.findByUserId(id);
     }
+
+    @Transactional
+    public Client findByCpf(String cpf) {
+        return clientRepository.findByCpf(cpf).orElseThrow(
+                ()-> new EntityNotFoundException(String.format("CPF Client '%s' not found", cpf)));
+    }
+
 }

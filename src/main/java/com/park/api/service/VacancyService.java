@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class VacancyService {
@@ -28,5 +30,12 @@ public class VacancyService {
     public Vacancy findByCode(String code){
         return vacancyRepository.findByCode(code).orElseThrow(
                 ()-> new EntityNotFoundException(String.format("vacancy with code '%s' not found", code)));
+    }
+
+    @Transactional
+    public Vacancy findByFreeVacancy() {
+        return vacancyRepository.findFirstByStatusVacancy(Vacancy.StatusVacancy.FREE).orElseThrow(
+                ()-> new EntityNotFoundException("No free vacancies found.")
+        );
     }
 }
