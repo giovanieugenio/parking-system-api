@@ -4,7 +4,7 @@ insert into tb_user(id, username, password, role) values (102, 'abby@gmail.com',
 
 
 insert into tb_client(id, name, cpf, id_user) values (10, 'Ellie Williams', '42104344000', 101);
-insert into tb_client(id, name, cpf, id_user) values (11, 'Abigail Anderson', '66484519048', 102);
+insert into tb_client(id, name, cpf, id_user) values (22, 'Abigail Anderson', '66484519048', 102);
 
 insert into tb_vacancy (id, code, status) values (100, 'A-01', 'OCCUPIED');
 insert into tb_vacancy (id, code, status) values (200, 'A-02', 'OCCUPIED');

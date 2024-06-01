@@ -1,6 +1,7 @@
 package com.park.api.web.controller;
 
 import com.park.api.entities.ClientVacancy;
+import com.park.api.service.ClientVacancyService;
 import com.park.api.service.ParkingService;
 import com.park.api.web.dto.ParkingCreateDTO;
 import com.park.api.web.dto.ParkingResponseDTO;
@@ -18,10 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -32,6 +30,7 @@ import java.net.URI;
 public class ParkingController {
 
     private final ParkingService parkingService;
+    private final ClientVacancyService clientVacancyService;
 
     @Operation(summary = "Check-In operation",
             security = @SecurityRequirement(name = "security"),
@@ -67,5 +66,13 @@ public class ParkingController {
                 .buildAndExpand(clientVacancy.getReceipt())
                 .toUri();
         return ResponseEntity.created(location).body(responseDTO);
+    }
+
+    @GetMapping("/check-in/{receipt}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
+    public ResponseEntity<ParkingResponseDTO> getByReceipt(@PathVariable String receipt){
+        ClientVacancy clientVacancy = clientVacancyService.findByReceipt(receipt);
+        ParkingResponseDTO responseDTO = ClientVacancyMapper.toDTO(clientVacancy);
+        return ResponseEntity.ok(responseDTO);
     }
 }
