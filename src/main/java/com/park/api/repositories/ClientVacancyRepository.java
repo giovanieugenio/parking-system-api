@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface ClientVacancyRepository extends JpaRepository<ClientVacancy, Long> {
     Optional<ClientVacancy> findByReceiptAndExitDateIsNull(String receipt);
+
+    long countByClientCpfAndExitDateNotNull(String cpf);
 }
