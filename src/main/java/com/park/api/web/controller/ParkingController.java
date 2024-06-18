@@ -9,6 +9,8 @@ import com.park.api.web.dto.UserResponseDTO;
 import com.park.api.web.dto.mapper.ClientVacancyMapper;
 import com.park.api.web.exceptions.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -76,6 +78,25 @@ public class ParkingController {
         return ResponseEntity.ok(responseDTO);
     }
 
+    @Operation(summary = "Check-Out operation",
+            security = @SecurityRequirement(name = "security"),
+            parameters = {
+                    @Parameter(in = ParameterIn.PATH, name = "receipt", description = "Receipt number generate by check-in")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "resource created successfully",
+                            content = @Content(mediaType = "application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ParkingResponseDTO.class))),
+                    @ApiResponse(responseCode = "404",
+                            description = "Recepit number not found.",
+                            content = @Content(mediaType = "application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "403",
+                            description = "Permission denied when accessing the resource.",
+                            content = @Content(mediaType = "application/json;charset=UTF-8",
+                                    schema = @Schema(implementation = ErrorMessage.class))),
+            })
     @PutMapping("/check-out/{receipt}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ParkingResponseDTO> checkOut(@PathVariable String receipt){

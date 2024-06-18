@@ -175,10 +175,55 @@ public class ParkingIT {
         testClient.get().uri("/api/v1/parking/check-in/{receipt}", "20230313-777300")
                 .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ellie@gmail.com", "123456"))
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isNotFound()
                 .expectBody()
                 .jsonPath("status").isEqualTo("404")
                 .jsonPath("path").isEqualTo("/api/v1/parking/check-in/20230313-777300")
                 .jsonPath("method").isEqualTo("GET");
     }
+
+    @Test
+    public void createCheckOut_WithExistingReceipt_Status200() {
+        testClient.get().uri("/api/v1/parking/check-in/{receipt}", "20230313-101300")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("plate").isEqualTo("FIT-1020")
+                .jsonPath("brand").isEqualTo("FIAT")
+                .jsonPath("model").isEqualTo("PALIO")
+                .jsonPath("color").isEqualTo("VERDE")
+                .jsonPath("clientCpf").isEqualTo("66484519048")
+                .jsonPath("receipt").isEqualTo("20230313-101300")
+                .jsonPath("entryDate").exists()
+                .jsonPath("exitDate").exists()
+                .jsonPath("code").isEqualTo("A-01")
+                .jsonPath("price").exists()
+                .jsonPath("discount").exists();
+    }
+
+    @Test
+    public void createCheckOut_WithNonExistingReceipt_Status404() {
+        testClient.put().uri("/api/v1/parking/check-in/{receipt}", "00000013-00001300")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("status").isEqualTo("404")
+                .jsonPath("path").isEqualTo("/api/v1/parking/check-in/00000013-00001300")
+                .jsonPath("method").isEqualTo("PUT");
+    }
+
+    @Test
+    public void createCheckOut_WithClientRole_Status403() {
+        testClient.put().uri("/api/v1/parking/check-in/{receipt}", "20230313-101300")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ellie@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody()
+                .jsonPath("status").isEqualTo("403")
+                .jsonPath("path").isEqualTo("/api/v1/parking/check-in/20230313-101300")
+                .jsonPath("method").isEqualTo("PUT");
+    }
+
 }
