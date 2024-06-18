@@ -3,8 +3,11 @@ package com.park.api.service;
 import com.park.api.entities.ClientVacancy;
 import com.park.api.exception.EntityNotFoundException;
 import com.park.api.repositories.ClientVacancyRepository;
+import com.park.api.repositories.projection.ClientVacancyProjection;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -30,5 +33,10 @@ public class ClientVacancyService {
     @Transactional
     public long getTotalTimesParkingComplete(String cpf) {
         return repository.countByClientCpfAndExitDateNotNull(cpf);
+    }
+
+    @Transactional
+    public Page<ClientVacancyProjection> findAllByClientCpf(String cpf, Pageable pageable) {
+        return repository.findAllByCloientCpf(cpf, pageable);
     }
 }
