@@ -1,7 +1,6 @@
 package com.park.api.service;
 
 import com.park.api.entities.Client;
-import com.park.api.entities.Vacancy;
 import com.park.api.exception.CpfUniqueViolationException;
 import com.park.api.exception.EntityNotFoundException;
 import com.park.api.repositories.ClientRepository;

@@ -1,6 +1,7 @@
 package com.park.api.web.controller;
 
 import com.park.api.entities.ClientVacancy;
+import com.park.api.jwt.JwtUserDetails;
 import com.park.api.repositories.projection.ClientVacancyProjection;
 import com.park.api.service.ClientVacancyService;
 import com.park.api.service.ParkingService;
@@ -27,6 +28,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -129,4 +131,5 @@ public class ParkingController {
         PageableDTO dto = PageableMapper.toDTO(projection);
         return ResponseEntity.ok(dto);
     }
+
 }

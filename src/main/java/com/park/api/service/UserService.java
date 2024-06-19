@@ -15,7 +15,7 @@ import com.park.api.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor  //variable userRepository
+@RequiredArgsConstructor
 @Service
 public class UserService {
 

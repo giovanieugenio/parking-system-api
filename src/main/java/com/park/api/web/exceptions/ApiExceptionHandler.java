@@ -1,6 +1,10 @@
 package com.park.api.web.exceptions;
 
-import com.park.api.exception.*;
+import com.park.api.exception.CodeUniqueViolationException;
+import com.park.api.exception.CpfUniqueViolationException;
+import com.park.api.exception.EntityNotFoundException;
+import com.park.api.exception.PasswordInvalidException;
+import com.park.api.exception.UsernameUniqueViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

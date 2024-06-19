@@ -1,7 +1,8 @@
 package com.park.api;
 
+import com.park.api.web.dto.PageableDTO;
 import com.park.api.web.dto.ParkingCreateDTO;
-import com.park.api.web.dto.VacancyCreateDTO;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -224,6 +225,47 @@ public class ParkingIT {
                 .jsonPath("status").isEqualTo("403")
                 .jsonPath("path").isEqualTo("/api/v1/parking/check-in/20230313-101300")
                 .jsonPath("method").isEqualTo("PUT");
+    }
+
+    @Test
+    public void findParking_WithClientCpf_Status403() {
+        PageableDTO responseBody = testClient.get().uri("/api/v1/parking/cpf/{cpf}?size=1&page=0", "66484519048")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PageableDTO.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(0);
+        Assertions.assertThat(responseBody.getSize()).isEqualTo(1);
+
+        testClient.get().uri("/api/v1/parking/cpf/{cpf}?size=1&page=1", "66484519048")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PageableDTO.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getSize()).isEqualTo(1);
+    }
+
+    @Test
+    public void findParking_WithClientCpfRole_Status403() {
+        testClient.get().uri("/api/v1/parking/cpf/{cpf}", "42104344000")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ellie@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody()
+                .jsonPath("status").isEqualTo("403")
+                .jsonPath("path").isEqualTo("/api/v1/parking/cpf/42104344000")
+                .jsonPath("method").isEqualTo("GET");
     }
 
 }

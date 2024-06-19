@@ -2,7 +2,6 @@ package com.park.api.web.controller;
 
 import com.park.api.entities.Vacancy;
 import com.park.api.service.VacancyService;
-import com.park.api.web.dto.UserResponseDTO;
 import com.park.api.web.dto.VacancyCreateDTO;
 import com.park.api.web.dto.VacancyResponseDTO;
 import com.park.api.web.dto.mapper.VacancyMapper;
