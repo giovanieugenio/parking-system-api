@@ -132,4 +132,16 @@ public class ParkingController {
         return ResponseEntity.ok(dto);
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageableDTO> getAllParkingClient(@AuthenticationPrincipal JwtUserDetails user,
+                                                           @PageableDefault(
+                                                                  size = 5,
+                                                                  sort = "entryDate",
+                                                                  direction = Sort.Direction.ASC
+                                                          )Pageable pageable) {
+        Page<ClientVacancyProjection> projection = clientVacancyService.findAllByUserId(user.getId(), pageable);
+        PageableDTO dto = PageableMapper.toDTO(projection);
+        return ResponseEntity.ok(dto);
+    }
 }

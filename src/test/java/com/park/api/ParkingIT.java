@@ -228,7 +228,7 @@ public class ParkingIT {
     }
 
     @Test
-    public void findParking_WithClientCpf_Status403() {
+    public void findParking_WithClientCpf_Status200() {
         PageableDTO responseBody = testClient.get().uri("/api/v1/parking/cpf/{cpf}?size=1&page=0", "66484519048")
                 .headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
                 .exchange()
@@ -268,4 +268,44 @@ public class ParkingIT {
                 .jsonPath("method").isEqualTo("GET");
     }
 
+    @Test
+    public void findParking_WithClientLoggedIn_Status200() {
+        PageableDTO responseBody = testClient.get().uri("/api/v1/parking?size=1&page=0")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "abby@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PageableDTO.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(0);
+        Assertions.assertThat(responseBody.getSize()).isEqualTo(1);
+
+        testClient.get().uri("/api/v1/parking?size=1&page=1")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "abby@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PageableDTO.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getSize()).isEqualTo(1);
+    }
+
+    @Test
+    public void findParking_WithAdminRole_FindClientLoggedIn_Status403() {
+        testClient.get().uri("/api/v1/parking")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "joel@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody()
+                .jsonPath("status").isEqualTo("403")
+                .jsonPath("path").isEqualTo("/api/v1/parking")
+                .jsonPath("method").isEqualTo("GET");
+    }
 }

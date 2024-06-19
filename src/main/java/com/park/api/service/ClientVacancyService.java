@@ -39,4 +39,9 @@ public class ClientVacancyService {
     public Page<ClientVacancyProjection> findAllByClientCpf(String cpf, Pageable pageable) {
         return repository.findAllByCloientCpf(cpf, pageable);
     }
+
+    @Transactional
+    public Page<ClientVacancyProjection> findAllByUserId(Long id, Pageable pageable) {
+        return repository.findAllByClientUserId(id, pageable);
+    }
 }
